@@ -1,9 +1,13 @@
 coreapi==2.3.0
 coreschema==0.0.4
 Django==1.11
+django-extensions==1.7.8
 itypes==1.1.0
 Jinja2==2.9.6
 MarkupSafe==1.0
+pylibmc==1.5.2
+python-memcached==1.58
 pytz==2017.2
 requests==2.13.0
+six==1.10.0
 uritemplate==3.0.0

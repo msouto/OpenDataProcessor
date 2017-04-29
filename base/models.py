@@ -10,7 +10,7 @@ class ConfiguracaoSistema(models.Model):
     senha_suap = models.CharField(max_length=255, verbose_name='Senha do SUAP')
 
     # Configurações do CKAN
-    url_ckan = models.URLField(max_length=255, verbose_name='URL da API do CKAN')
+    url_ckan = models.URLField(max_length=255, verbose_name='URL do CKAN')
     token_ckan = models.CharField(max_length=255, verbose_name='Token de Autenticação do CKAN')
 
     # Dados do Responsável pelo Portal de Dados Abertos
@@ -46,7 +46,7 @@ class ConjuntoDeDados(models.Model):
     etiquetas = models.CharField(max_length=80, verbose_name='Etiquetas', help_text='Informe as etiquetas separadas por vírgula. Exemplo: "ensino, pesquisa, extensão"')
 
     # Configurações do Endpoint da API no SUAP
-    url_endpoint = models.URLField(verbose_name='URL do Endpoint na API do SUAP')
+    url_endpoint = models.CharField(max_length=255, verbose_name='URL do Endpoint na API do SUAP')
 
     # Configurações da Extração
     periodicidade_extracao = models.PositiveIntegerField(choices=PERIODICIDADE_CHOICES, verbose_name='Periodicidade', default=PERIDIOCIDADE_SEMANAL)
