@@ -60,9 +60,13 @@ class Command(BaseCommand):
                 else:
                     raise CommandError('Não foi possível acessar o endpoint do conjunto de dados.\nRetorno da API do SUAP: %s' % requisicao.json())
 
+            # Exibindo a quantidade de dados extraídos
+            self.stdout.write(self.style.SUCCESS('\n== %s dados extraídos com sucesso. ==' % len(dados)))
+
             # Fazendo cache dos dados extraídos
-            cache.set('conjunto_dados_%s' % conjunto_dados_id, dados)
+            chave_cache = 'dados_extraidos_%s' % conjunto_dados.slug
+            cache.set(chave_cache, dados)
+            self.stdout.write(self.style.SUCCESS('\n== Os dados extraídos foram inseridos no cache através da chave "%s". ==' % chave_cache))
 
             # Exibindo a mensagem de Sucesso na Extração.
-            self.stdout.write(self.style.SUCCESS('\n== %s dados extraídos com sucesso. ==' % len(dados)))
             self.stdout.write(self.style.SUCCESS('== Finalizando a extração do conjunto de dados #%s ==\n' % conjunto_dados_id))

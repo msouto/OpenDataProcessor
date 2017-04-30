@@ -69,7 +69,8 @@ class RegistroExtracao(models.Model):
     )
 
     conjunto_dados = models.ForeignKey('base.ConjuntoDeDados', verbose_name='Conjunto de Dados')
-    data_horario_extracao = models.DateTimeField(verbose_name='Data e Horário da Extração', auto_now=True)
+    data_horario_inicio_extracao = models.DateTimeField(verbose_name='Data e Horário de Início da Extração')
+    data_horario_termino_extracao = models.DateTimeField(verbose_name='Data e Horário de Término da Extração')
     quantidade_registros = models.PositiveIntegerField(verbose_name='Quantidade de Registros Extraídos')
     status = models.PositiveIntegerField(choices=STATUS_CHOICES, verbose_name='Status')
 
