@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib import admin
 from base.forms import ConfiguracaoSistemaForm
-from base.models import ConfiguracaoSistema, ConjuntoDeDados
+from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao
 
 
 @admin.register(ConfiguracaoSistema)
@@ -17,3 +17,7 @@ class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
 class ConjuntoDeDadosAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'descricao', 'slug', 'periodicidade_extracao', 'horario_extracao')
     prepopulated_fields = {"slug": ("titulo",)}
+
+@admin.register(RegistroExtracao)
+class RegistroExtracaoAdmin(admin.ModelAdmin):
+    list_display = ('conjunto_dados', 'data_horario_inicio_extracao', 'data_horario_termino_extracao', 'quantidade_registros', 'status')
