@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib import admin
 from base.forms import ConfiguracaoSistemaForm
-from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao
+from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao, Organizacao
 
 
 @admin.register(ConfiguracaoSistema)
@@ -12,6 +12,12 @@ class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False if self.model.objects.count() > 0 else super(ConfiguracaoSistemaAdmin, self).has_add_permission(request)
+
+@admin.register(Organizacao)
+class OrganizacaoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'descricao', 'slug', 'id_ckan')
+    exclude = ('id_ckan',)
+    prepopulated_fields = {"slug": ("nome",)}
 
 @admin.register(ConjuntoDeDados)
 class ConjuntoDeDadosAdmin(admin.ModelAdmin):

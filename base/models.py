@@ -24,6 +24,45 @@ class ConfiguracaoSistema(models.Model):
         verbose_name = 'Configuração do Sistema'
         verbose_name_plural = 'Configurações do Sistema'
 
+class Organizacao(models.Model):
+    nome = models.CharField(max_length=80, verbose_name='Nome', help_text='Exemplo: Instituto Federal do Rio Grande do Norte')
+    descricao = models.TextField(verbose_name='Descrição')
+    slug = models.SlugField(max_length=80, verbose_name='Slug')
+    url_logomarca = models.URLField(verbose_name='URL da Logomarca')
+    id_ckan = models.CharField(max_length=80, verbose_name='ID no CKAN', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        from ckanapi import RemoteCKAN
+        configuracao_sistema = ConfiguracaoSistema.objects.first()
+        ckan = RemoteCKAN(configuracao_sistema.url_ckan, apikey=configuracao_sistema.token_ckan)
+
+        import ipdb; ipdb.set_trace()
+        try:
+            if not self.id:
+                # Criando a Organização no CKAN
+                retorno = ckan.action.organization_create(name=self.slug,title=self.nome,description=self.descricao,image_url=self.url_logomarca)
+
+                self.id_ckan = retorno.get('id')
+            else:
+                # Atualizando a Organização no CKAN
+                retorno = ckan.action.organization_update(
+                    id=self.id,
+                    name=self.slug,
+                    title=self.nome,
+                    description=self.descricao,
+                    image_url=self.url_logomarca
+                )
+
+                self.id_ckan = retorno.get('id')
+        except:
+            pass
+
+        super(Organizacao, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Organização'
+        verbose_name_plural = 'Organizações'
+
 class ConjuntoDeDados(models.Model):
     PERIDIOCIDADE_DIARIA = 1
     PERIDIOCIDADE_SEMANAL = 2
@@ -40,6 +79,7 @@ class ConjuntoDeDados(models.Model):
     )
 
     # Configurações do Dataset no CKAN
+    organizacao = models.ForeignKey('base.Organizacao', verbose_name='Organização', null=True)
     titulo = models.CharField(max_length=80, verbose_name='Título')
     descricao = models.TextField(verbose_name='Descrição')
     slug = models.SlugField(max_length=80, verbose_name='Slug')
