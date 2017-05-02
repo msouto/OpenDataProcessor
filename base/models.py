@@ -109,6 +109,9 @@ class Grupo(models.Model):
 
         super(Grupo, self).save(*args, **kwargs)
 
+    def __unicode__(self):
+        return self.nome
+
     class Meta:
         verbose_name = 'Grupo'
         verbose_name_plural = 'Grupos'
