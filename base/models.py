@@ -36,11 +36,15 @@ class Organizacao(models.Model):
         configuracao_sistema = ConfiguracaoSistema.objects.first()
         ckan = RemoteCKAN(configuracao_sistema.url_ckan, apikey=configuracao_sistema.token_ckan)
 
-        import ipdb; ipdb.set_trace()
         try:
             if not self.id:
                 # Criando a Organização no CKAN
-                retorno = ckan.action.organization_create(name=self.slug,title=self.nome,description=self.descricao,image_url=self.url_logomarca)
+                retorno = ckan.action.organization_create(
+                    name=self.slug,
+                    title=self.nome,
+                    description=self.descricao,
+                    image_url=self.url_logomarca
+                )
 
                 self.id_ckan = retorno.get('id')
             else:
@@ -58,6 +62,9 @@ class Organizacao(models.Model):
             pass
 
         super(Organizacao, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.nome
 
     class Meta:
         verbose_name = 'Organização'
@@ -84,6 +91,7 @@ class ConjuntoDeDados(models.Model):
     descricao = models.TextField(verbose_name='Descrição')
     slug = models.SlugField(max_length=80, verbose_name='Slug')
     etiquetas = models.CharField(max_length=80, verbose_name='Etiquetas', help_text='Informe as etiquetas separadas por vírgula. Exemplo: "ensino, pesquisa, extensão"')
+    id_ckan = models.CharField(max_length=80, verbose_name='ID no CKAN', blank=True, null=True)
 
     # Configurações do Endpoint da API no SUAP
     url_endpoint = models.CharField(max_length=255, verbose_name='URL do Endpoint na API do SUAP')
@@ -91,6 +99,49 @@ class ConjuntoDeDados(models.Model):
     # Configurações da Extração
     periodicidade_extracao = models.PositiveIntegerField(choices=PERIODICIDADE_CHOICES, verbose_name='Periodicidade', default=PERIDIOCIDADE_SEMANAL)
     horario_extracao = models.TimeField(verbose_name='Horário de Execução da Extração', default='00:00')
+
+    def save(self, *args, **kwargs):
+        from ckanapi import RemoteCKAN
+        configuracao_sistema = ConfiguracaoSistema.objects.first()
+        ckan = RemoteCKAN(configuracao_sistema.url_ckan, apikey=configuracao_sistema.token_ckan)
+
+        try:
+            if not self.id:
+                # Criando o Conjunto de Dados no CKAN
+                retorno = ckan.action.package_create(
+                    name=self.slug,
+                    title=self.titulo,
+                    author='Sistema Unificado de Administração Pública (SUAP)', #TODO: Incluir campo na configuração
+                    author_email='digti@ifrn.edu.br', #TODO: Incluir campo na configuração
+                    maintainer=configuracao_sistema.nome_mantenedor,
+                    maintainer_email=configuracao_sistema.email_mantenedor,
+                    notes=self.descricao,
+                    url=configuracao_sistema.url_suap + self.url_endpoint,
+                    owner_org=self.organizacao.id_ckan
+                )
+
+                self.id_ckan = retorno.get('id')
+            else:
+                # Atualizando o Conjunto de Dados no CKAN
+                retorno = ckan.action.package_update(
+                    id=self.id_ckan,
+                    name=self.slug,
+                    title=self.titulo,
+                    author='Sistema Unificado de Administração Pública (SUAP)',  # TODO: Incluir campo na configuração
+                    author_email='digti@ifrn.edu.br',  # TODO: Incluir campo na configuração
+                    maintainer=configuracao_sistema.nome_mantenedor,
+                    maintainer_email=configuracao_sistema.email_mantenedor,
+                    notes=self.descricao,
+                    url=configuracao_sistema.url_suap + self.url_endpoint,
+                    owner_org=self.organizacao.id_ckan
+                )
+
+                self.id_ckan = retorno.get('id')
+        except:
+            pass
+
+        super(ConjuntoDeDados, self).save(*args, **kwargs)
+
 
     def __unicode__(self):
         return 'Conjunto de Dados: %s' % self.titulo

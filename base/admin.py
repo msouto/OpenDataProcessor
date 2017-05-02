@@ -21,7 +21,8 @@ class OrganizacaoAdmin(admin.ModelAdmin):
 
 @admin.register(ConjuntoDeDados)
 class ConjuntoDeDadosAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'descricao', 'slug', 'periodicidade_extracao', 'horario_extracao')
+    list_display = ('titulo', 'organizacao', 'descricao', 'slug', 'periodicidade_extracao', 'horario_extracao', 'id_ckan')
+    exclude = ('id_ckan',)
     prepopulated_fields = {"slug": ("titulo",)}
 
 @admin.register(RegistroExtracao)
