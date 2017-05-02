@@ -50,7 +50,7 @@ class Organizacao(models.Model):
             else:
                 # Atualizando a Organização no CKAN
                 retorno = ckan.action.organization_update(
-                    id=self.id,
+                    id=self.id_ckan,
                     name=self.slug,
                     title=self.nome,
                     description=self.descricao,
@@ -82,27 +82,30 @@ class Grupo(models.Model):
         configuracao_sistema = ConfiguracaoSistema.objects.first()
         ckan = RemoteCKAN(configuracao_sistema.url_ckan, apikey=configuracao_sistema.token_ckan)
 
-        if not self.id:
-            # Criando o Grupo no CKAN
-            retorno = ckan.action.group_create(
-                name=self.slug,
-                title=self.nome,
-                description=self.descricao,
-                image_url=self.url_logomarca
-            )
+        try:
+            if not self.id:
+                # Criando o Grupo no CKAN
+                retorno = ckan.action.group_create(
+                    name=self.slug,
+                    title=self.nome,
+                    description=self.descricao,
+                    image_url=self.url_imagem
+                )
 
-            self.id_ckan = retorno.get('id')
-        else:
-            # Atualizando o Grupo no CKAN
-            retorno = ckan.action.group_update(
-                id=self.id,
-                name=self.slug,
-                title=self.nome,
-                description=self.descricao,
-                image_url=self.url_logomarca
-            )
+                self.id_ckan = retorno.get('id')
+            else:
+                # Atualizando o Grupo no CKAN
+                retorno = ckan.action.group_update(
+                    id=self.id_ckan,
+                    name=self.slug,
+                    title=self.nome,
+                    description=self.descricao,
+                    image_url=self.url_imagem
+                )
 
-            self.id_ckan = retorno.get('id')
+                self.id_ckan = retorno.get('id')
+        except:
+            pass
 
         super(Grupo, self).save(*args, **kwargs)
 
