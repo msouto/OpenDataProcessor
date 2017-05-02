@@ -62,6 +62,14 @@ class ConjuntoDeDadosAdmin(admin.ModelAdmin):
             'fields': ('periodicidade_extracao', 'horario_extracao')
         }),
     )
+    actions = ('extrair_dados',)
+
+    def extrair_dados(self, request, queryset):
+        from django.core.management import call_command
+        for obj in queryset:
+            call_command('extrair_dados', obj.pk)
+        self.message_user(request, "Dados extraídos com sucesso!")
+    extrair_dados.short_description = "Extrair Dados dos Conjuntos de Dados selecionados"
 
 @admin.register(RegistroExtracao, site=admin_site)
 class RegistroExtracaoAdmin(admin.ModelAdmin):
