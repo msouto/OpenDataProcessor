@@ -212,6 +212,9 @@ class RegistroExtracao(models.Model):
     quantidade_registros = models.PositiveIntegerField(verbose_name='Quantidade de Registros Extraídos')
     status = models.PositiveIntegerField(choices=STATUS_CHOICES, verbose_name='Status')
 
+    def __unicode__(self):
+        return 'Registro de Extração: %s' % self.conjunto_dados.titulo
+
     class Meta:
         verbose_name = 'Registro de Extração de Dados'
         verbose_name_plural = 'Registros de Extração de Dados'

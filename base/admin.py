@@ -66,3 +66,14 @@ class ConjuntoDeDadosAdmin(admin.ModelAdmin):
 @admin.register(RegistroExtracao, site=admin_site)
 class RegistroExtracaoAdmin(admin.ModelAdmin):
     list_display = ('conjunto_dados', 'data_horario_inicio_extracao', 'data_horario_termino_extracao', 'quantidade_registros', 'status')
+    fieldsets = (
+        ('Conjunto de Dados', {
+            'fields': ('conjunto_dados',),
+        }),
+        ('Resumo da Extração', {
+            'fields': ('data_horario_inicio_extracao', 'data_horario_termino_extracao', 'quantidade_registros')
+        }),
+        ('Status', {
+            'fields': ('status',),
+        }),
+    )
