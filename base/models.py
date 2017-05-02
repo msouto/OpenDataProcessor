@@ -164,7 +164,10 @@ class ConjuntoDeDados(models.Model):
                     maintainer_email=configuracao_sistema.email_mantenedor,
                     notes=self.descricao,
                     url=configuracao_sistema.url_suap + self.url_endpoint,
-                    owner_org=self.organizacao.id_ckan
+                    owner_org=self.organizacao.id_ckan,
+                    groups=[{
+                        'id': self.grupo.id_ckan
+                    }]
                 )
 
                 self.id_ckan = retorno.get('id')
@@ -180,7 +183,10 @@ class ConjuntoDeDados(models.Model):
                     maintainer_email=configuracao_sistema.email_mantenedor,
                     notes=self.descricao,
                     url=configuracao_sistema.url_suap + self.url_endpoint,
-                    owner_org=self.organizacao.id_ckan
+                    owner_org=self.organizacao.id_ckan,
+                    groups=[{
+                        'id': self.grupo.id_ckan
+                    }]
                 )
 
                 self.id_ckan = retorno.get('id')
