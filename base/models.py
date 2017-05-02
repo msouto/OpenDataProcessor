@@ -26,9 +26,9 @@ class ConfiguracaoSistema(models.Model):
 
 class Organizacao(models.Model):
     nome = models.CharField(max_length=80, verbose_name='Nome', help_text='Exemplo: Instituto Federal do Rio Grande do Norte')
-    descricao = models.TextField(verbose_name='Descrição')
+    descricao = models.TextField(verbose_name='Descrição', blank=True, null=True)
     slug = models.SlugField(max_length=80, verbose_name='Slug')
-    url_logomarca = models.URLField(verbose_name='URL da Logomarca')
+    url_logomarca = models.URLField(verbose_name='URL da Logomarca', blank=True, null=True)
     id_ckan = models.CharField(max_length=80, verbose_name='ID no CKAN', blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -70,6 +70,46 @@ class Organizacao(models.Model):
         verbose_name = 'Organização'
         verbose_name_plural = 'Organizações'
 
+class Grupo(models.Model):
+    nome = models.CharField(max_length=80, verbose_name='Nome', help_text='Exemplo: Ensino')
+    descricao = models.TextField(verbose_name='Descrição', blank=True, null=True)
+    slug = models.SlugField(max_length=80, verbose_name='Slug')
+    url_imagem = models.URLField(verbose_name='URL da Imagem', blank=True, null=True)
+    id_ckan = models.CharField(max_length=80, verbose_name='ID no CKAN', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        from ckanapi import RemoteCKAN
+        configuracao_sistema = ConfiguracaoSistema.objects.first()
+        ckan = RemoteCKAN(configuracao_sistema.url_ckan, apikey=configuracao_sistema.token_ckan)
+
+        if not self.id:
+            # Criando o Grupo no CKAN
+            retorno = ckan.action.group_create(
+                name=self.slug,
+                title=self.nome,
+                description=self.descricao,
+                image_url=self.url_logomarca
+            )
+
+            self.id_ckan = retorno.get('id')
+        else:
+            # Atualizando o Grupo no CKAN
+            retorno = ckan.action.group_update(
+                id=self.id,
+                name=self.slug,
+                title=self.nome,
+                description=self.descricao,
+                image_url=self.url_logomarca
+            )
+
+            self.id_ckan = retorno.get('id')
+
+        super(Grupo, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Grupo'
+        verbose_name_plural = 'Grupos'
+
 class ConjuntoDeDados(models.Model):
     PERIDIOCIDADE_DIARIA = 1
     PERIDIOCIDADE_SEMANAL = 2
@@ -87,8 +127,9 @@ class ConjuntoDeDados(models.Model):
 
     # Configurações do Dataset no CKAN
     organizacao = models.ForeignKey('base.Organizacao', verbose_name='Organização', null=True)
+    grupo = models.ForeignKey('base.Grupo', verbose_name='Grupo', null=True)
     titulo = models.CharField(max_length=80, verbose_name='Título')
-    descricao = models.TextField(verbose_name='Descrição')
+    descricao = models.TextField(verbose_name='Descrição', blank=True, null=True)
     slug = models.SlugField(max_length=80, verbose_name='Slug')
     etiquetas = models.CharField(max_length=80, verbose_name='Etiquetas', help_text='Informe as etiquetas separadas por vírgula. Exemplo: "ensino, pesquisa, extensão"')
     id_ckan = models.CharField(max_length=80, verbose_name='ID no CKAN', blank=True, null=True)

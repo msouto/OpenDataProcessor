@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib import admin
 from base.forms import ConfiguracaoSistemaForm
-from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao, Organizacao
+from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao, Organizacao, Grupo
 
 
 @admin.register(ConfiguracaoSistema)
@@ -15,6 +15,12 @@ class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
 
 @admin.register(Organizacao)
 class OrganizacaoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'descricao', 'slug', 'id_ckan')
+    exclude = ('id_ckan',)
+    prepopulated_fields = {"slug": ("nome",)}
+
+@admin.register(Grupo)
+class GrupoAdmin(admin.ModelAdmin):
     list_display = ('nome', 'descricao', 'slug', 'id_ckan')
     exclude = ('id_ckan',)
     prepopulated_fields = {"slug": ("nome",)}
