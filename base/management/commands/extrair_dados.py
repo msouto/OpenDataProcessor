@@ -9,6 +9,8 @@ import unicodecsv as csv
 from ckanapi.remoteckan import RemoteCKAN
 from django.core.cache import cache
 from django.core.management.base import BaseCommand, CommandError
+import json
+
 from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao
 
 class Command(BaseCommand):
@@ -91,13 +93,13 @@ class Command(BaseCommand):
                 dados = cache.get(chave_cache)
 
             # Salvando o arquivo JSON para carregar no CKAN.
-            # filename = '/tmp/dados_extraidos_%s.json' % conjunto_dados.slug
-            # with open(filename, 'w') as arquivo_json:
-            #     json.dump(dados, arquivo_json)
+            filename_json = '/tmp/dados_extraidos_%s.json' % conjunto_dados.slug
+            with open(filename_json, 'w') as arquivo_json:
+                json.dump(dados, arquivo_json)
 
             # Salvando o arquivo CSV para carregar no CKAN.
-            filename = '/tmp/dados_extraidos_%s.csv' % conjunto_dados.slug
-            with open(filename, 'wb') as csv_file:
+            filename_csv = '/tmp/dados_extraidos_%s.csv' % conjunto_dados.slug
+            with open(filename_csv, 'wb') as csv_file:
                 write_header = True
                 item_keys = []
                 writer = csv.writer(csv_file, delimiter=str(";"), quotechar=str('"'))
@@ -122,25 +124,27 @@ class Command(BaseCommand):
 
                     writer.writerow(item_values)
 
-            # Enviando o arquivo para o CKAN
+            # Enviando o arquivo CSV para o CKAN
             ckan = RemoteCKAN(configuracao_sistema.url_ckan, apikey=configuracao_sistema.token_ckan)
             retorno_json = ckan.action.package_show(id=conjunto_dados.id_ckan)
 
             if retorno_json.get('num_resources') == 0:
-                ckan.action.resource_create(
-                    package_id=conjunto_dados.id_ckan,
-                    name=conjunto_dados.titulo,
-                    url=conjunto_dados.slug,
-                    upload=open(filename, 'rb')
-                )
+                for filename in [filename_json, filename_csv]:
+                    ckan.action.resource_create(
+                        package_id=conjunto_dados.id_ckan,
+                        name=conjunto_dados.titulo,
+                        url=conjunto_dados.slug,
+                        upload=open(filename, 'rb')
+                    )
             else:
-                id_recurso = retorno_json.get('resources')[0].get('id')
-                ckan.action.resource_update(
-                    id=id_recurso,
-                    name=conjunto_dados.titulo,
-                    url=conjunto_dados.slug,
-                    upload=open(filename, 'rb')
-                )
+                for index, filename in enumerate([filename_json, filename_csv]):
+                    id_recurso = retorno_json.get('resources')[index].get('id')
+                    ckan.action.resource_update(
+                        id=id_recurso,
+                        name=conjunto_dados.titulo,
+                        url=conjunto_dados.slug,
+                        upload=open(filename, 'rb')
+                    )
 
             # Salvando o Registro de Execução da Extração.
             RegistroExtracao.objects.create(
