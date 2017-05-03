@@ -2,16 +2,14 @@
 from __future__ import unicode_literals
 
 import datetime
-import json
+from types import StringTypes
 
 import requests
+import unicodecsv as csv
 from ckanapi.remoteckan import RemoteCKAN
 from django.core.cache import cache
 from django.core.management.base import BaseCommand, CommandError
-
 from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao
-from base.utils import WriteDictToCSV
-
 
 class Command(BaseCommand):
     help = 'Closes the specified poll for voting'
@@ -93,9 +91,36 @@ class Command(BaseCommand):
                 dados = cache.get(chave_cache)
 
             # Salvando o arquivo JSON para carregar no CKAN.
-            filename = '/tmp/dados_extraidos_%s.json' % conjunto_dados.slug
-            with open(filename, 'w') as arquivo_json:
-                json.dump(dados, arquivo_json)
+            # filename = '/tmp/dados_extraidos_%s.json' % conjunto_dados.slug
+            # with open(filename, 'w') as arquivo_json:
+            #     json.dump(dados, arquivo_json)
+
+            # Salvando o arquivo CSV para carregar no CKAN.
+            filename = '/tmp/dados_extraidos_%s.csv' % conjunto_dados.slug
+            with open(filename, 'wb') as csv_file:
+                write_header = True
+                item_keys = []
+                writer = csv.writer(csv_file, delimiter=str(";"), quotechar=str('"'))
+
+                for item in dados:
+                    item_values = []
+                    for key in item:
+                        if write_header:
+                            item_keys.append(key)
+
+                        value = item.get(key, '')
+                        if isinstance(value, StringTypes):
+                            item_values.append(value.encode('utf-8'))
+                        if isinstance(value, list) or isinstance(value, tuple):
+                            item_values.append(', '.join(value))
+                        else:
+                            item_values.append(value)
+
+                    if write_header:
+                        writer.writerow(item_keys)
+                        write_header = False
+
+                    writer.writerow(item_values)
 
             # Enviando o arquivo para o CKAN
             ckan = RemoteCKAN(configuracao_sistema.url_ckan, apikey=configuracao_sistema.token_ckan)
@@ -116,6 +141,7 @@ class Command(BaseCommand):
                     url=conjunto_dados.slug,
                     upload=open(filename, 'rb')
                 )
+
             # Salvando o Registro de Execução da Extração.
             RegistroExtracao.objects.create(
                 conjunto_dados=conjunto_dados,
