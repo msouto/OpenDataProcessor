@@ -49,7 +49,7 @@ class Organizacao(models.Model):
                 self.id_ckan = retorno.get('id')
             else:
                 # Atualizando a Organização no CKAN
-                retorno = ckan.action.organization_update(
+                retorno = ckan.action.organization_patch(
                     id=self.id_ckan,
                     name=self.slug,
                     title=self.nome,
@@ -95,7 +95,7 @@ class Grupo(models.Model):
                 self.id_ckan = retorno.get('id')
             else:
                 # Atualizando o Grupo no CKAN
-                retorno = ckan.action.group_update(
+                retorno = ckan.action.group_patch(
                     id=self.id_ckan,
                     name=self.slug,
                     title=self.nome,
@@ -167,13 +167,14 @@ class ConjuntoDeDados(models.Model):
                     owner_org=self.organizacao.id_ckan,
                     groups=[{
                         'id': self.grupo.id_ckan
-                    }]
+                    }],
+                    tags=list({'name': x} for x in self.etiquetas.split(','))
                 )
 
                 self.id_ckan = retorno.get('id')
             else:
                 # Atualizando o Conjunto de Dados no CKAN
-                retorno = ckan.action.package_update(
+                retorno = ckan.action.package_patch(
                     id=self.id_ckan,
                     name=self.slug,
                     title=self.titulo,
@@ -186,7 +187,8 @@ class ConjuntoDeDados(models.Model):
                     owner_org=self.organizacao.id_ckan,
                     groups=[{
                         'id': self.grupo.id_ckan
-                    }]
+                    }],
+                    tags = list({'name': x} for x in self.etiquetas.split(','))
                 )
 
                 self.id_ckan = retorno.get('id')
