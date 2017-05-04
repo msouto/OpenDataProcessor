@@ -1,0 +1,6 @@
+[program:odp]
+directory = /var/opt/odp/
+user = www-data
+command = /var/opt/odp/deploy/gunicorn_start.sh
+stdout_logfile = /var/opt/odp/deploy/logs/supervisor/out.log
+stderr_logfile = /var/opt/odp/deploy/logs/supervisor/err.log
