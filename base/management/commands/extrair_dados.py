@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import json
 from types import StringTypes
 
 import requests
@@ -9,7 +10,6 @@ import unicodecsv as csv
 from ckanapi.remoteckan import RemoteCKAN
 from django.core.cache import cache
 from django.core.management.base import BaseCommand, CommandError
-import json
 
 from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao
 

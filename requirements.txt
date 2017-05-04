@@ -24,11 +24,9 @@ pickleshare==0.7.4
 prompt-toolkit==1.0.14
 ptyprocess==0.5.1
 Pygments==2.2.0
-pylibmc==1.5.2
 pyparsing==2.2.0
 python-crontab==2.2.1
 python-dateutil==2.6.0
-python-memcached==1.58
 pytz==2017.2
 requests==2.13.0
 scandir==1.5
