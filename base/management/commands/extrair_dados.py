@@ -113,7 +113,7 @@ class Command(BaseCommand):
                         value = item.get(key, '')
                         if isinstance(value, StringTypes):
                             item_values.append(value.encode('utf-8'))
-                        if isinstance(value, list) or isinstance(value, tuple):
+                        elif isinstance(value, list) or isinstance(value, tuple):
                             item_values.append(', '.join(value))
                         else:
                             item_values.append(value)
