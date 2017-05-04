@@ -114,6 +114,9 @@ class Command(BaseCommand):
                         if isinstance(value, StringTypes):
                             item_values.append(value.encode('utf-8'))
                         elif isinstance(value, list) or isinstance(value, tuple):
+                            if len(value) != 0 and isinstance(value[0], dict):
+                                if value[0].get('nome'):
+                                    value = map(lambda d: d.get('nome', None), value)
                             item_values.append(', '.join(value))
                         else:
                             item_values.append(value)
