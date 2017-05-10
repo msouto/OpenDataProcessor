@@ -49,7 +49,7 @@ class GrupoAdmin(admin.ModelAdmin):
 @admin.register(ConjuntoDeDados, site=admin_site)
 class ConjuntoDeDadosAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'organizacao', 'grupo', 'descricao', 'slug', 'periodicidade_extracao', 'horario_extracao', 'id_ckan')
-    exclude = ('id_ckan',)
+    # exclude = ('id_ckan',)
     prepopulated_fields = {"slug": ("titulo",)}
     fieldsets = (
         ('Dados Gerais', {
@@ -59,7 +59,7 @@ class ConjuntoDeDadosAdmin(admin.ModelAdmin):
             'fields': ('url_endpoint',)
         }),
         ('Extração', {
-            'fields': ('periodicidade_extracao', 'horario_extracao')
+            'fields': ('periodicidade_extracao', 'horario_extracao', 'id_ckan')
         }),
     )
     actions = ('extrair_dados',)
