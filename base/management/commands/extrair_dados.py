@@ -14,7 +14,7 @@ from django.core.management.base import BaseCommand, CommandError
 from base.models import ConfiguracaoSistema, ConjuntoDeDados, RegistroExtracao
 
 class Command(BaseCommand):
-    help = 'Closes the specified poll for voting'
+    help = 'Realiza a extração dos conjuntos de dados e os carrega no CKAN.'
 
     def add_arguments(self, parser):
         parser.add_argument('conjunto_dados_id', nargs='+', type=int)
