@@ -4,4 +4,4 @@ Aplicação responsável pela coleta dos dados, pela transformação desses dado
 
 ### Arquitetura da Aplicação
 
-![Arquitetura da Aplicação](OpenDataCollector_01.png)
+![Arquitetura da Aplicação](OpenDataCollector_02.png)
